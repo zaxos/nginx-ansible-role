@@ -1,0 +1,28 @@
+---
+# tasks file for nginx-ansible-role
+
+- name: Add official nginx signing key
+  rpm_key: 
+    key: http://nginx.org/keys/nginx_signing.key
+  when: nginx_repo_enabled
+
+- name: Add nginx repository (install from repo)
+  template:
+    src: nginx.repo.j2
+    dest: /etc/yum.repos.d/nginx.repo
+    owner: root
+    group: root
+    mode: 0644
+  when: nginx_repo_enabled
+
+- name: Add epel repository (install from epel)
+  yum:
+    name: epel-release
+    state: present
+  when: nginx_repo_enabled == False
+
+- name: Install nginx
+  yum:
+    name: nginx
+    state: present
+    update_cache: yes

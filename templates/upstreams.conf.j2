@@ -1,0 +1,26 @@
+#
+# {{ ansible_managed_message }}
+#
+
+{% for upstream in nginx_upstreams %}
+upstream {{ upstream.name }} {
+{% if upstream.lb_method is defined %}
+    {{ upstream.lb_method }};
+{% endif %}
+{% for server in upstream.servers %}
+    server {{ server }};
+{% endfor %}
+{% if upstream.keepalive is defined %}
+    keepalive {{ upstream.keepalive }};
+{% endif %}
+{% if upstream.extra_parameters is defined %}
+{% for key,value in upstream.extra_parameters.items() %}
+    {{ key }} {{ value }};
+{% endfor %}
+{% endif %}
+{% if upstream.extra_parameters_raw is defined %}
+    {{ upstream.extra_parameters_raw | indent(4) }}
+{% endif %}
+}
+
+{% endfor %}

@@ -1,0 +1,107 @@
+---
+# defaults file for nginx-ansible-role
+
+## set to False to install nginx from epel
+nginx_repo_enabled: True
+
+## default templates
+nginx_default_conf_template: "nginx.conf.j2"
+nginx_default_vhost_template: "vhost.conf.j2"
+nginx_default_upstreams_template: "upstreams.conf.j2"
+
+## config paths and defaults
+nginx_ansible_managed_conf_path: "/etc/nginx/conf.ansible.d"
+
+nginx_default_conf_file: "/etc/nginx/nginx.conf"
+nginx_default_conf_path: "/etc/nginx/conf.d"
+
+nginx_default_vhost_file: "/etc/nginx/conf.d/default.conf"
+nginx_remove_default_vhost_file: False
+
+## nginx conf
+nginx_pid_file: "/var/run/nginx.pid"
+nginx_mime_file: "/etc/nginx/mime.types"
+nginx_default_type: "application/octet-stream"
+
+# global log files
+nginx_error_log_path: "/var/log/nginx/error.log"
+nginx_error_log_options: "warn"
+nginx_access_log_path: "/var/log/nginx/access.log"
+nginx_access_log_options: "main"
+
+# nginx config parameters
+nginx_worker_processes: "{{ ansible_processor_vcpus | default('auto') }}"
+nginx_worker_connections: "1024"
+
+nginx_client_max_body_size: "32m"
+
+nginx_sendfile: "on"
+nginx_tcp_nopush: "on"
+nginx_tcp_nodelay: "on"
+
+nginx_send_timeout: "60"
+nginx_keepalive_timeout: "75"
+nginx_keepalive_requests: "100"
+
+nginx_server_tokens: "on"
+nginx_server_names_hash_bucket_size: "64"
+
+nginx_types_hash_max_size: "1024"
+
+nginx_log_format: |
+ '$remote_addr - $remote_user [$time_local] "$request" '
+ '$status $body_bytes_sent "$http_referer" '
+ '"$http_user_agent" "$http_x_forwarded_for"'
+
+nginx_gzip: "off"
+nginx_conf_gzip_extra_parameters: {}
+nginx_conf_gzip_extra_parameters_raw: ""
+
+nginx_conf_events_extra_parameters: {}
+
+nginx_conf_http_extra_parameters: {}
+
+nginx_conf_extra_parameters: {}
+
+nginx_conf_events_extra_parameters_raw: ""
+
+nginx_conf_http_extra_parameters_raw: ""
+
+nginx_conf_extra_parameters_raw: ""
+
+## vhosts and server upstream list variables
+nginx_vhosts: []
+
+nginx_upstreams: []
+
+## other role variables
+nginx_user: nginx
+nginx_group: nginx
+
+nginx_autoremove_ansible_managed_config_files: True
+
+nginx_vhosts_conf_files_list: []
+
+ansible_managed_message: "{{ ansible_managed }}"
+
+#############
+## EXAPLES ##
+#############
+
+#nginx_conf_gzip_extra_parameters:
+#  gzip_comp_level: 5
+#  gzip_disable: "msie6"
+#  gzip_vary: "on"
+#  gzip_proxied: "any"
+#  gzip_http_version: "1.1"
+#  gzip_min_length: "256"
+#  gzip_types: "text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript application/vnd.ms-fontobject application/x-font-ttf font/opentype image/svg+xml image/x-icon"
+
+#nginx_conf_gzip_extra_parameters_raw: |
+# gzip_comp_level 5;
+# gzip_disable msie6;
+# gzip_vary on;
+# gzip_proxied any;
+# gzip_http_version 1.1;
+# gzip_min_length 256;
+# gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript application/vnd.ms-fontobject application/x-font-ttf font/opentype image/svg+xml image/x-icon;

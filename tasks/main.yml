@@ -1,0 +1,9 @@
+---
+# tasks file for nginx-ansible-role
+
+- name: Install nginx (RedHat)
+  include: install-EL.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Configure nginx
+  include: configure.yml

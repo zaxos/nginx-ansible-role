@@ -1,0 +1,71 @@
+---
+# tasks file for nginx-ansible-role
+
+- name: Ensure config path(s) presense
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ nginx_default_conf_path }}"
+    - "{{ nginx_ansible_managed_conf_path }}"
+
+- name: Remove default nginx vhost config file
+  file:
+    path: "{{ nginx_default_vhost_file }}"
+    state: absent
+  when: nginx_remove_default_vhost_file
+  notify: restart nginx
+
+- name: Apply nginx upstream(s) config file
+  template:
+    src: "{{ nginx_default_upstreams_template }}"
+    dest: "{{ nginx_ansible_managed_conf_path }}/upstreams.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nginx
+
+- name: Apply ansible managed vhost config file(s)
+  template:
+    src: "{{ item.template | default(nginx_default_vhost_template) }}"
+    dest: "{{ nginx_ansible_managed_conf_path }}/{{ item.filename | default(item.server_name.split(' ')[0] + '.' + item.listen.split(' ')[0] + '.conf') }}"
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ nginx_vhosts }}"
+  register: nginx_vhosts_conf
+  notify: restart nginx
+  when: >
+    nginx_vhosts and
+    item.state | default("present") != "absent"
+
+- name: Create list of ansible managed vhost config file(s)
+  set_fact:
+      nginx_vhosts_conf_files_list: "{{ nginx_vhosts_conf.results|selectattr('dest', 'string')|map(attribute='dest')|list + nginx_vhosts_conf.results|selectattr('path', 'string')|map(attribute='path')|select|list }}"
+  when: nginx_vhosts
+
+- name: Create list of current ansible managed vhost config file(s)
+  command: find {{ nginx_ansible_managed_conf_path }} -type f -name "*.conf"
+  register: nginx_vhosts_conf_files_current_list
+  changed_when: False
+
+- name: Remove unnecessary ansible managed vhost config file(s)
+  file: 
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ nginx_vhosts_conf_files_current_list.stdout_lines }}"
+  when: >
+     item not in nginx_vhosts_conf_files_list and
+     item != nginx_ansible_managed_conf_path + '/upstreams.conf' and
+     nginx_autoremove_ansible_managed_config_files
+  notify: restart nginx
+
+- name: Apply default nginx config file
+  template:
+    src: "{{ nginx_default_conf_template }}"
+    dest: "{{ nginx_default_conf_file }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nginx

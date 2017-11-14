@@ -1,0 +1,81 @@
+#
+# {{ ansible_managed_message }}
+#
+
+user  {{ nginx_user }};
+worker_processes  {{ nginx_worker_processes }};
+
+error_log  {{ nginx_error_log_path }} {{ nginx_error_log_options }};
+pid        {{ nginx_pid_file }};
+
+
+events {
+    worker_connections  {{ nginx_worker_connections }};
+{% if nginx_conf_events_extra_parameters %}
+{% for key,value in nginx_conf_events_extra_parameters.items() %}
+    {{ key }} {{ value }};
+{% endfor %}
+{% endif %}
+{% if nginx_conf_events_extra_parameters_raw %}
+    {{ nginx_conf_events_extra_parameters_raw | indent(4) }}
+{% endif %}
+}
+
+
+http {
+    include       {{ nginx_mime_file }};
+    default_type  {{ nginx_default_type }};
+
+    log_format  main  {{ nginx_log_format | indent(22, False) }};
+
+    access_log  {{ nginx_access_log_path }}  {{ nginx_access_log_options }};
+
+    sendfile        {{ nginx_sendfile }};
+    tcp_nopush      {{ nginx_tcp_nopush }};
+    tcp_nodelay     {{ nginx_tcp_nodelay }};
+
+    keepalive_timeout  {{ nginx_keepalive_timeout }};
+    keepalive_requests {{ nginx_keepalive_requests }};
+    send_timeout       {{ nginx_send_timeout }};
+
+    server_names_hash_bucket_size {{ nginx_server_names_hash_bucket_size }};
+
+    client_max_body_size {{ nginx_client_max_body_size }};
+
+    types_hash_max_size {{ nginx_types_hash_max_size }};
+
+    gzip {{ nginx_gzip }};
+{% if nginx_gzip == "on" %}
+{% if nginx_conf_gzip_extra_parameters %}
+{% for key,value in nginx_conf_gzip_extra_parameters.items() %}
+    {{ key }} {{ value }};
+{% endfor %}
+{% endif %}
+{% if nginx_conf_gzip_extra_parameters_raw %}
+    {{ nginx_conf_gzip_extra_parameters_raw|indent(4) }}
+{% endif %}
+{% endif %}
+
+{% if nginx_conf_http_extra_parameters %}
+{% for key,value in nginx_conf_http_extra_parameters.items() %}
+    {{ key }} {{ value }};
+{% endfor %}
+{% endif %}
+{% if nginx_conf_http_extra_parameters_raw %}
+    {{ nginx_conf_http_extra_parameters_raw | indent(4) }}
+{% endif %}
+
+    include {{ nginx_default_conf_path }}/*.conf;
+{% if nginx_default_conf_path != nginx_ansible_managed_conf_path %}
+    include {{ nginx_ansible_managed_conf_path }}/*.conf;
+{% endif %}
+}
+
+{% if nginx_conf_extra_parameters %}
+{% for key,value in nginx_conf_extra_parameters.items() %}
+{{ key }} {{ value }};
+{% endfor %}
+{% endif %}
+{% if nginx_conf_extra_parameters_raw %}
+{{ nginx_conf_extra_parameters_raw }}
+{% endif %}
