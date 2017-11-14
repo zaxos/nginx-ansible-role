@@ -27,6 +27,16 @@ server {
     server_name {{ item.server_name }};
 {% endif %}
 
+{% if item.ssl is defined and item.ssl %}
+{% for key,value in item.ssl.items() %}
+{% if key != 'raw' %}
+    {{ key }} {{ value }};
+{% else %}
+    {{ item.ssl.raw | indent(4) }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
 {% if item.root is defined %}
     root {{ item.root }};
 {% endif %}
@@ -47,6 +57,26 @@ server {
 
 {% if item.return is defined %}
     return {{ item.return }};
+{% endif %}
+
+{% if item.rewrites is defined and item.rewrites %}
+{% for key,value in item.rewrites.items() %}
+{% if key != 'raw' %}
+    rewrite {{ key }} {{ value }};
+{% else %}
+    {{ item.rewrites.raw | indent(4) }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if item.extra_parameters is defined and item.extra_parameters %}
+{% for key,value in item.extra_parameters.items() %}
+    {{ key }} {{ value }};
+{% endfor %}
+{% endif %}
+
+{% if item.extra_parameters_raw is defined %}
+    {{ item.extra_parameters_raw | indent(4) }}
 {% endif %}
 
 {% if item.locations is defined and item.locations %}
@@ -72,21 +102,5 @@ server {
     }
 
 {% endfor %}
-{% endif %}
-
-{% if item.rewrites is defined and item.rewrites %}
-{% for key,value in item.rewrites.items() %}
-    rewrite {{ key }} {{ value }};
-{% endfor %}
-{% endif %}
-
-{% if item.extra_parameters is defined and item.extra_parameters %}
-{% for key,value in item.extra_parameters.items() %}
-    {{ key }} {{ value }};
-{% endfor %}
-{% endif %}
-
-{% if item.extra_parameters_raw is defined %}
-    {{ item.extra_parameters_raw | indent(4) }}
 {% endif %}
 }
