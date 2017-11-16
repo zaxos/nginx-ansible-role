@@ -10,8 +10,33 @@ server {
 {% if item.ipv6 | default(True) %}
     listen       [::]:80;
 {% endif %}
+
     server_name  {{ item.server_name_redirect_https }};
     return       301 https://{{ item.server_name.split(' ')[0] }}$request_uri;
+}
+{% endif %}
+
+{% if item.server_name_redirect is defined and item.server_name is defined %}
+server {
+{% if item.ipv4 | default(True) %}
+    listen       {{ item.listen | default('80') }};
+{% endif %}
+{% if item.ipv6 | default(True) %}
+    listen       [::]:{{ item.listen | default('80') }};
+{% endif %}
+
+{% if item.ssl is defined and item.ssl %}
+{% for key,value in item.ssl.items() %}
+{% if key != 'raw' %}
+    {{ key }} {{ value }};
+{% else %}
+    {{ item.ssl.raw | indent(4) }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+    server_name  {{ item.server_name_redirect }};
+    return       301 $scheme://{{ item.server_name.split(' ')[0] }}$request_uri;
 }
 {% endif %}
 
