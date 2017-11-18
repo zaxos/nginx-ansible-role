@@ -10,7 +10,8 @@ pid        {{ nginx_pid_file }};
 
 
 events {
-    worker_connections  {{ nginx_worker_connections }};
+    worker_connections {{ nginx_worker_connections }};
+    multi_accept {{ nginx_multi_accept }};
 {% if nginx_conf_events_extra_parameters %}
 {% for key,value in nginx_conf_events_extra_parameters.items() %}
     {{ key }} {{ value }};

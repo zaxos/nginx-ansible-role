@@ -32,6 +32,7 @@ nginx_access_log_options: "main"
 # nginx config parameters
 nginx_worker_processes: "{{ ansible_processor_vcpus | default('auto') }}"
 nginx_worker_connections: "1024"
+nginx_multi_accept: "off"
 
 nginx_client_max_body_size: "32m"
 
