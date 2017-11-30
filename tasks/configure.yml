@@ -28,7 +28,7 @@
 - name: Apply ansible managed vhost config file(s)
   template:
     src: "{{ item.template | default(nginx_default_vhost_template) }}"
-    dest: "{{ nginx_ansible_managed_conf_path }}/{{ item.filename | default(item.server_name.split(' ')[0] + '.' + item.listen.split(' ')[0] + '.conf') }}"
+    dest: "{{ nginx_ansible_managed_conf_path }}/{{ item.filename | default(item.server_name.split(' ')[0] + '.' + (item.listen | default('80')).split(' ')[0]  + '.conf') }}"
     force: yes
     owner: root
     group: root
