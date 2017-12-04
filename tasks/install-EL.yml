@@ -17,8 +17,13 @@
 
 - name: Add epel repository (install from epel)
   yum:
-    name: epel-release
+    name: "{{ epel_url }}"
     state: present
+  when: nginx_repo_enabled == False
+
+- name: Add epel repository signing key
+  rpm_key:
+    key: "{{ epel_key }}"
   when: nginx_repo_enabled == False
 
 - name: Install nginx
