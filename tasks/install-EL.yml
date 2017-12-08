@@ -31,3 +31,8 @@
     name: nginx
     state: present
     update_cache: yes
+
+- name: Enable/Disable nginx service
+  systemd:
+    name: nginx
+    enabled: "{% if nginx_service_enabled_on_startup %}yes{% else %}no{% endif %}"

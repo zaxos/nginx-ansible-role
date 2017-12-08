@@ -79,6 +79,8 @@ nginx_upstreams: []
 nginx_user: nginx
 nginx_group: nginx
 
+nginx_service_enabled_on_startup: True
+
 nginx_autoremove_ansible_managed_config_files: True
 
 nginx_vhosts_conf_files_list: []
